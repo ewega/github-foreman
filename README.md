@@ -2,6 +2,22 @@
 
 GitHub Foreman is a Copilot agent plugin for coordinating GitHub issue-to-PR work across Copilot, Claude, Codex, code review, CI, documentation, and human merge gates.
 
+## Why
+
+AI agents can write code — but coordinating multiple agents working in parallel across a real repository is a different problem. Without orchestration, agents conflict, duplicate work, skip review, or leave documentation behind. Foreman solves this by acting as the coordinator: it plans work into waves, dispatches the right agent for each issue, runs the review and docs loop, and only presents a merge gate when the wave is actually ready.
+
+The goal is to keep humans in the loop at the decisions that matter — what to build next and when to ship — while letting agents handle the rest.
+
+## Human interactions
+
+Foreman is designed so a human only needs to act at two points in the cycle:
+
+1. **Approve the wave plan.** Foreman reads the repo's issues, proposes a wave of work, and waits for you to confirm before dispatching any agents. You can adjust scope before approving.
+
+2. **Approve the merge.** After agents complete their work, code review, and docs pass, Foreman presents a summary of all PRs in the wave and waits for explicit merge approval. Nothing merges automatically.
+
+Everything in between — dispatching agents, running review loops, tracking CI, invoking the docs writer — is handled by Foreman.
+
 The plugin packages:
 
 - a main `github-foreman` custom agent
