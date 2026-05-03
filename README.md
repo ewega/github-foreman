@@ -70,58 +70,42 @@ The Foreman agent follows this sequence:
 ```mermaid
 graph TB
     H["👤 Human Developer"]
-    F["🎯 GitHub Foreman<br/>(coordinator)"]
-    
-    subgraph agents["Copilot Agents (Cloud)"]
-        Codex["Codex"]
-        Claude["Claude"]
-        RD["Copilot<br/>(repository-developer)"]
-        DW["Copilot<br/>(docs-writer)"]
-    end
+    F["🎯 GitHub Foreman"]
     
     subgraph github["GitHub"]
-        subgraph repo["Repository"]
-            Issues["📋 Issues<br/>(wave)"]
-            PRs["🔀 PRs"]
+        Issues["📋 Issues<br/>(if needed)"]
+        WaveStart["🌊 Wave Start"]
+        
+        subgraph agents["Agents"]
+            Working["Copilot (repo-dev)<br/>Claude / Codex"]
         end
         
-        subgraph gates["Checks & Gates"]
-            CodeReview["👀 Code Review"]
-            CI["✅ CI"]
-        end
+        CodeReview["👀 Code Review"]
+        DW["📝 docs-writer"]
+        PRs["🔀 PRs"]
+        CI["✅ CI"]
     end
     
-    H -->|"plan wave"| F
-    F -->|"read & assign"| Issues
-    F -->|"dispatch"| Codex
-    F -->|"dispatch"| Claude
-    F -->|"dispatch"| RD
+    H -->|"plan"| F
+    F -->|"update"| Issues
+    F -->|"start"| WaveStart
+    WaveStart -->|"dispatch"| Working
+    Working -->|"opens"| PRs
     
-    Codex -->|"opens"| PRs
-    Claude -->|"opens"| PRs
-    RD -->|"opens"| PRs
+    Working <-->|"review loop"| CodeReview
+    CodeReview -->|"approved"| DW
     
-    F -->|"request"| CodeReview
-    CodeReview <-->|"review & iterate"| Codex
-    CodeReview <-->|"review & iterate"| Claude
-    CodeReview <-->|"review & iterate"| RD
-    
-    Codex --> DW
-    Claude --> DW
-    RD --> DW
     DW -->|"docs"| PRs
-    
     PRs --> CI
+    
     CI -.->|"status"| F
     F -->|"summary"| H
-    H -->|"merge approval"| F
+    H -->|"approve merge"| F
     F -->|"merge"| PRs
     
     style H fill:#e1f5ff
     style F fill:#fff3e0
-    style Codex fill:#c8e6c9
-    style Claude fill:#c8e6c9
-    style RD fill:#c8e6c9
+    style Working fill:#c8e6c9
     style DW fill:#c8e6c9
 ```
 
