@@ -69,25 +69,74 @@ The Foreman agent follows this sequence:
 
 ```mermaid
 graph TB
-    H["Human Developer"]
-    F["GitHub Foreman<br/>(coordinator)"]
+    H["👤 Human Developer"]
+    F["🎯 GitHub Foreman<br/>(coordinator & orchestrator)"]
     
-    subgraph "GitHub"
-        GH["GitHub<br/>(issues, PRs, checks)"]
-        AGENTS["Agents<br/>(code work, docs, review)"]
+    subgraph local["Local Agents"]
+        DW["📝 docs-writer"]
+        RD["💻 repository-developer"]
     end
     
-    H -->|"plan"| F
-    F -->|"create & assign issues"| GH
-    GH -->|"agents read & branch"| AGENTS
-    AGENTS -->|"open PRs"| GH
-    F -->|"dispatch agents<br/>in wave"| AGENTS
-    AGENTS -->|"code review &<br/>docs writer"| GH
-    GH -->|"checks & status"| F
-    F -->|"wave review &<br/>consistency"| GH
-    F -->|"summary"| H
+    subgraph gh["GitHub Platform"]
+        subgraph repo["Repository"]
+            Issues["📋 Issues<br/>(wave, dependencies)"]
+            PRs["🔀 Pull Requests"]
+            Base["📦 Base Branch"]
+            Agent_Branch["🌿 Agent Branch"]
+        end
+        
+        subgraph checks["Checks & Review"]
+            CI["✅ CI/GitHub Actions"]
+            CodeReview["👀 Code Review Agent"]
+            DocsCheck["📚 Docs Writer Task"]
+        end
+        
+        subgraph agents_cloud["Cloud Agents"]
+            Copilot["🤖 Copilot<br/>(repository-developer)"]
+            Claude["🧠 Claude"]
+            Codex["⚡ Codex"]
+        end
+    end
+    
+    H -->|"plan next wave"| F
+    F -->|"read & analyze"| Issues
+    F -->|"create & assign"| Issues
+    F -->|"dispatch in wave"| Copilot
+    F -->|"dispatch in wave"| Claude
+    F -->|"dispatch in wave"| Codex
+    
+    Copilot -->|"branch from"| Base
+    Claude -->|"branch from"| Base
+    Codex -->|"branch from"| Base
+    Copilot --> Agent_Branch
+    Claude --> Agent_Branch
+    Codex --> Agent_Branch
+    
+    Agent_Branch -->|"opens"| PRs
+    F -->|"request"| CodeReview
+    CodeReview -->|"review & comment"| PRs
+    
+    F -->|"dispatch"| DW
+    DW -->|"optional updates"| PRs
+    F -->|"or gh agent-task"| DocsCheck
+    DocsCheck -->|"updates"| PRs
+    
+    PRs -->|"trigger"| CI
+    CI -->|"status"| PRs
+    F -->|"monitor"| PRs
+    F -->|"monitor"| CI
+    
+    F -->|"wave review<br/>summary"| H
     H -->|"merge approval"| F
-    F -->|"merge PRs"| GH
+    F -->|"merge"| PRs
+    
+    style H fill:#e1f5ff
+    style F fill:#fff3e0
+    style DW fill:#f3e5f5
+    style RD fill:#f3e5f5
+    style Copilot fill:#c8e6c9
+    style Claude fill:#c8e6c9
+    style Codex fill:#c8e6c9
 ```
 
 ### Sequential flow
