@@ -76,24 +76,25 @@ graph TB
         Issues["📋 Issues"]
         WaveStart["🌊 Wave Start"]
         
-        subgraph agents["Agents (parallel dispatch)"]
+        subgraph agents["Agents"]
             Working["Copilot (repo-dev)<br/>Claude / Codex"]
+            CodeReview["👀 Code Review"]
+            DW["Copilot (docs-writer)"]
         end
         
-        CodeReview["👀 Code Review"]
-        DW["Copilot (docs-writer)"]
         PRs["🔀 PRs"]
         CI["✅ CI"]
         Base["📦 Base Branch"]
     end
     
     H -->|"plan"| F
-    F -->|"update"| Issues
+    F -->|"create/update"| Issues
     Issues -->|"read"| WaveStart
     F -->|"start"| WaveStart
-    WaveStart -->|"dispatch all"| Working
+    WaveStart -->|"dispatch"| Working
     Working -->|"opens"| PRs
     
+    F -->|"dispatch"| CodeReview
     Working <-->|"review loop"| CodeReview
     CodeReview -->|"approved"| DW
     
