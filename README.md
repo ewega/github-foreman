@@ -100,7 +100,6 @@ graph TB
     
     PRs <-->|"trigger/status"| CI
     
-    CI -->|"summary"| F
     F -->|"summary"| H
     H -->|"approve merge"| F
     F -->|"merge into"| Base
