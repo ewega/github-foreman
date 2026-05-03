@@ -78,7 +78,7 @@ graph TB
         
         subgraph agents["Agents"]
             Working["Copilot (repo-dev)<br/>Claude / Codex"]
-            CodeReview["👀 Code Review"]
+            CodeReview["Copilot (Code Review Agent)"]
             DW["Copilot (docs-writer)"]
         end
         
@@ -110,6 +110,7 @@ graph TB
     style H fill:#e1f5ff
     style F fill:#fff3e0
     style Working fill:#c8e6c9
+    style CodeReview fill:#c8e6c9
     style DW fill:#c8e6c9
 ```
 
