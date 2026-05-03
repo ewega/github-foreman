@@ -72,53 +72,53 @@ graph TB
     H["👤 Human Developer"]
     F["🎯 GitHub Foreman<br/>(coordinator)"]
     
-    subgraph repo["Repository"]
-        Issues["📋 Issues<br/>(wave, dependencies)"]
-        PRs["🔀 Pull Requests"]
-        Base["📦 Base Branch"]
-    end
-    
     subgraph agents["Copilot Agents (Cloud)"]
-        RD["💻 repository-developer"]
-        Claude["🧠 Claude"]
-        Codex["⚡ Codex"]
-        DW["📝 docs-writer"]
+        Codex["Codex"]
+        Claude["Claude"]
+        RD["Copilot<br/>(repository-developer)"]
+        DW["Copilot<br/>(docs-writer)"]
+        Codex --> Claude --> RD --> DW
     end
     
-    subgraph gates["Checks & Gates"]
-        CodeReview["👀 Code Review Agent"]
-        CI["✅ CI/GitHub Actions"]
+    subgraph github["GitHub"]
+        subgraph repo["Repository"]
+            Issues["📋 Issues<br/>(wave)"]
+            PRs["🔀 PRs"]
+        end
+        
+        subgraph gates["Checks & Gates"]
+            CodeReview["👀 Code Review"]
+            CI["✅ CI"]
+        end
     end
     
     H -->|"plan wave"| F
     F -->|"read & assign"| Issues
-    F -->|"dispatch wave"| RD
-    F -->|"dispatch wave"| Claude
-    F -->|"dispatch wave"| Codex
+    F -->|"dispatch"| Codex
     
-    RD -->|"code"| PRs
-    Claude -->|"code"| PRs
-    Codex -->|"code"| PRs
+    RD -->|"opens"| PRs
+    Claude -->|"opens"| PRs
+    Codex -->|"opens"| PRs
     
-    F -->|"request review"| CodeReview
-    CodeReview -->|"comments"| PRs
+    F -->|"request"| CodeReview
+    CodeReview <-->|"review & iterate"| RD
+    CodeReview <-->|"review & iterate"| Claude
+    CodeReview <-->|"review & iterate"| Codex
     
-    F -->|"dispatch"| DW
+    RD -->|"done, dispatch"| DW
     DW -->|"docs"| PRs
     
-    PRs -->|"trigger"| CI
-    CI -->|"status"| PRs
-    F -->|"monitor"| PRs
-    
+    PRs --> CI
+    CI -.->|"status"| F
     F -->|"summary"| H
     H -->|"merge approval"| F
     F -->|"merge"| PRs
     
     style H fill:#e1f5ff
     style F fill:#fff3e0
-    style RD fill:#c8e6c9
-    style Claude fill:#c8e6c9
     style Codex fill:#c8e6c9
+    style Claude fill:#c8e6c9
+    style RD fill:#c8e6c9
     style DW fill:#c8e6c9
 ```
 
