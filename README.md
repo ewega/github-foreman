@@ -77,7 +77,6 @@ graph TB
         Claude["Claude"]
         RD["Copilot<br/>(repository-developer)"]
         DW["Copilot<br/>(docs-writer)"]
-        Codex --> Claude --> RD --> DW
     end
     
     subgraph github["GitHub"]
@@ -95,17 +94,21 @@ graph TB
     H -->|"plan wave"| F
     F -->|"read & assign"| Issues
     F -->|"dispatch"| Codex
+    F -->|"dispatch"| Claude
+    F -->|"dispatch"| RD
     
-    RD -->|"opens"| PRs
-    Claude -->|"opens"| PRs
     Codex -->|"opens"| PRs
+    Claude -->|"opens"| PRs
+    RD -->|"opens"| PRs
     
     F -->|"request"| CodeReview
-    CodeReview <-->|"review & iterate"| RD
-    CodeReview <-->|"review & iterate"| Claude
     CodeReview <-->|"review & iterate"| Codex
+    CodeReview <-->|"review & iterate"| Claude
+    CodeReview <-->|"review & iterate"| RD
     
-    RD -->|"done, dispatch"| DW
+    Codex --> DW
+    Claude --> DW
+    RD --> DW
     DW -->|"docs"| PRs
     
     PRs --> CI
