@@ -73,10 +73,10 @@ graph TB
     F["🎯 GitHub Foreman"]
     
     subgraph github["GitHub"]
-        Issues["📋 Issues<br/>(if needed)"]
+        Issues["📋 Issues"]
         WaveStart["🌊 Wave Start"]
         
-        subgraph agents["Agents"]
+        subgraph agents["Agents (parallel dispatch)"]
             Working["Copilot (repo-dev)<br/>Claude / Codex"]
         end
         
@@ -88,8 +88,9 @@ graph TB
     
     H -->|"plan"| F
     F -->|"update"| Issues
+    Issues -->|"read"| WaveStart
     F -->|"start"| WaveStart
-    WaveStart -->|"dispatch"| Working
+    WaveStart -->|"dispatch all"| Working
     Working -->|"opens"| PRs
     
     Working <-->|"review loop"| CodeReview
