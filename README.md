@@ -85,6 +85,7 @@ graph TB
         PRs["🔀 PRs"]
         CI["✅ CI"]
         Base["📦 Base Branch"]
+        WaveEnd["🏁 Wave End"]
     end
     
     H -->|"plan"| F
@@ -104,6 +105,7 @@ graph TB
     H -->|"approve merge"| F
     F -->|"merge into"| Base
     PRs -->|"merged"| Base
+    Base --> WaveEnd
     
     style H fill:#e1f5ff
     style F fill:#fff3e0
