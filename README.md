@@ -81,9 +81,10 @@ graph TB
         end
         
         CodeReview["👀 Code Review"]
-        DW["📝 docs-writer"]
+        DW["Copilot (docs-writer)"]
         PRs["🔀 PRs"]
         CI["✅ CI"]
+        Base["📦 Base Branch"]
     end
     
     H -->|"plan"| F
@@ -102,7 +103,8 @@ graph TB
     CI -.->|"status"| F
     F -->|"summary"| H
     H -->|"approve merge"| F
-    F -->|"merge"| PRs
+    F -->|"merge into"| Base
+    PRs -->|"merged"| Base
     
     style H fill:#e1f5ff
     style F fill:#fff3e0
