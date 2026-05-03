@@ -84,6 +84,7 @@ graph TB
         DW["📝 docs-writer"]
         PRs["🔀 PRs"]
         CI["✅ CI"]
+        WaveReview["🔍 Wave Reviewer"]
     end
     
     H -->|"plan"| F
@@ -98,8 +99,9 @@ graph TB
     
     DW -->|"docs"| PRs
     PRs --> CI
+    CI --> WaveReview
     
-    CI -.->|"status"| F
+    WaveReview -.->|"consistency check"| F
     F -->|"summary"| H
     H -->|"approve merge"| F
     F -->|"merge"| PRs
