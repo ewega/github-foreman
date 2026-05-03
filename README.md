@@ -91,10 +91,10 @@ graph TB
     F -->|"create/update"| Issues
     Issues -->|"read"| WaveStart
     F -->|"start"| WaveStart
-    WaveStart -->|"dispatch"| Working
+    F -->|"dispatch"| Working
+    F -->|"dispatch"| CodeReview
     Working -->|"opens"| PRs
     
-    F -->|"dispatch"| CodeReview
     Working <-->|"review loop"| CodeReview
     CodeReview -->|"approved"| DW
     
