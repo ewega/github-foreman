@@ -103,7 +103,7 @@ graph TB
     
     F -->|"summary"| H
     H -->|"approve merge"| F
-    F -->|"merge into"| Base
+    F -->|"wave review"| PRs
     PRs -->|"merged"| Base
     Base --> WaveEnd
     
