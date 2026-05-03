@@ -1,0 +1,19 @@
+{
+  "name": "github-foreman",
+  "description": "GitHub issue-wave orchestration with Foreman custom agents and skills for Copilot, Claude, Codex, PR review, CI, and docs gates.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Eldrick Wega"
+  },
+  "license": "MIT",
+  "keywords": [
+    "github",
+    "copilot",
+    "agents",
+    "pull-requests",
+    "issues",
+    "foreman"
+  ],
+  "agents": "agents/",
+  "skills": "skills/"
+}
