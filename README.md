@@ -91,17 +91,16 @@ graph TB
     F -->|"create/update"| Issues
     Issues -->|"read"| WaveStart
     F -->|"start"| WaveStart
-    F -->|"dispatch"| Working
-    F -->|"dispatch"| CodeReview
+    WaveStart -->|"dispatch to"| Working
     Working -->|"opens"| PRs
     
-    Working <-->|"review loop"| CodeReview
+    Working <-->|"review"| CodeReview
     CodeReview -->|"approved"| DW
+    DW -->|"end result"| PRs
     
-    DW -->|"docs"| PRs
-    PRs --> CI
+    PRs <-->|"trigger/status"| CI
     
-    CI -.->|"status"| F
+    CI -->|"summary"| F
     F -->|"summary"| H
     H -->|"approve merge"| F
     F -->|"merge into"| Base
