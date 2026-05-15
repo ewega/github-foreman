@@ -74,6 +74,7 @@ Do not duplicate detailed GraphQL commands, bot node IDs, sleep intervals, or re
 6. Prefer `gh` CLI for GitHub management during the CLI-first experiment; use GitHub MCP tools only as fallback when the CLI surface is unavailable or ambiguous.
 7. Complete the review loop, docs-writer task, CI gate, and docs/consistency checks before asking the human to review or merge.
 8. Never merge without explicit human approval.
+9. After a wave is dispatched, do not hand control back to the human just because remote agents are working. Stay in the monitor, review, docs, and CI loop until the wave reaches the explicit human gate or a real blocker requires human input.
 
 ## Phase model
 
@@ -100,6 +101,8 @@ For Claude and Codex, add issue-comment context first, then assign the bot with 
 Use `foreman-workflow`.
 
 Follow the defined sleep and poll cadence until every dispatched issue has either produced a PR or failed.
+
+Do not stop at "agents are running" and ask the human what to do next. While agent tasks are in flight, continue sleeping, polling, and monitoring with agent-task status checks. Only surface back to the human early when a blocker, ambiguity, or failed task requires a decision.
 
 ### Phase 3: Code review loop
 
@@ -157,6 +160,8 @@ For multi-PR consistency, run the following checks directly:
 Only flag issues that matter for safe merging or post-merge correctness. Do not fill the report with style-only noise.
 
 ### Phase 6: Human gate
+
+This is the first normal point where control returns to the human after a wave has been dispatched.
 
 Present per-PR status, review outcome, CI outcome, docs outcome, consistency findings, links, and any remaining judgment calls. Wait for explicit merge approval.
 

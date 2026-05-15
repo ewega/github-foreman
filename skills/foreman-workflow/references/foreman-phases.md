@@ -18,6 +18,7 @@
 
 - Assign Copilot with native tooling.
 - Assign Claude/Codex through GraphQL after adding issue-comment context.
+- When model choice is available, prefer lighter execution-oriented models for routine implementation work and reserve heavier models for complex reasoning-heavy tasks.
 - Dispatch independent issues in parallel.
 - Track issue status.
 

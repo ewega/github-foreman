@@ -15,6 +15,8 @@ Use this skill whenever the Foreman is dispatching GitHub issues to Copilot, Cla
 
 When unsure, use Copilot.
 
+When the assignment path allows explicit model selection, prefer lighter execution-oriented models for routine coding work, edits, and fixup loops. Examples include Haiku-class models or other lightweight code-execution models. Reserve heavier models for planning, architecture, or unusually complex refactors where the extra reasoning depth is necessary.
+
 ## Copilot assignment
 
 Prefer CLI cloud-task assignment with the repository-developer custom agent:
@@ -46,6 +48,8 @@ If the preflight fails, fall back to the native/default Copilot assignment path 
 - model
 - custom instructions
 
+For the `model` field, prefer a lighter execution-oriented model by default. Only escalate to a heavier model when the task is materially reasoning-bound rather than execution-bound.
+
 Custom instructions should include:
 
 - issue acceptance criteria
@@ -73,6 +77,7 @@ Important constraints:
 - To provide extra context, add an issue comment before assigning the bot.
 - Include dependency and base-branch context in that issue comment.
 - Confirm the assignment response includes the expected bot login.
+- When the bot or assignment surface exposes model choice, prefer lighter execution-oriented models first and only step up when the issue truly needs deeper reasoning.
 
 ## Context comment template for Claude/Codex
 
