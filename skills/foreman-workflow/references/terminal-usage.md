@@ -12,6 +12,7 @@ The Foreman should use terminal access only for orchestration-safe commands:
 - `gh pr view`
 - `gh pr checks`
 - `gh pr edit --add-reviewer "@copilot"`
+- `gh api -X POST repos/{owner}/{repo}/pulls/{n}/requested_reviewers --field "reviewers[]=copilot-pull-request-reviewer[bot]"`
 - `gh pr merge`
 - `gh api graphql`
 - `gh api -X DELETE repos/{owner}/{repo}/git/refs/heads/{branch}`

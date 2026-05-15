@@ -6,7 +6,14 @@ Prefer this deterministic CLI trigger:
 gh pr edit PR_NUMBER --repo OWNER/REPO --add-reviewer "@copilot"
 ```
 
-Use `github/request_copilot_review` only as a fallback when the CLI path is unavailable.
+If that CLI path does not add the reviewer, fall back to the REST API request that targets the Copilot review bot explicitly:
+
+```sh
+gh api -X POST repos/OWNER/REPO/pulls/PR_NUMBER/requested_reviewers \
+	--field "reviewers[]=copilot-pull-request-reviewer[bot]"
+```
+
+Use `github/request_copilot_review` only as a last resort when neither CLI path is available.
 
 After requesting review:
 
