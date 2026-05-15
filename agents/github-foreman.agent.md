@@ -84,6 +84,20 @@ Use `repo-intake` and `foreman-workflow`.
 
 Read the target issues, identify dependencies, group unblocked work into waves, choose an agent for each issue, choose base branches, and present the plan for human approval.
 
+The plan must include a dispatch table for each wave before any assignment happens.
+
+Use this format:
+
+```md
+## Wave N Dispatch Plan
+
+| Task | Issue | Agent | Model | Base branch | Dependency / blocker context | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Short task name | #123 | Copilot / Claude / Codex | selected model or `default` | `main` or PR branch | unblocked / blocked by #122 / branch from PR #456 | brief rationale |
+```
+
+If the assignment path does not expose an explicit model, say `default` in the table. If the wave contains multiple issues, include one row per issue.
+
 ### Phase 1b: Draft issues
 
 When the user gives ideas rather than existing issues, read the repository's issue patterns and draft issues with problem, proposal, scope, acceptance criteria, dependencies, and references. Present drafts before creating issues.

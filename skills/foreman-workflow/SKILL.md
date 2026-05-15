@@ -20,7 +20,7 @@ The Foreman coordinates. It does not silently merge, skip review, or skip CI. It
 
 ## Phase summary
 
-1. **Plan**: read issues, dependencies, labels, milestones, repo instructions, and workflow signals.
+1. **Plan**: read issues, dependencies, labels, milestones, repo instructions, and workflow signals, then present a tabular wave dispatch plan with task, issue, agent, model, base branch, dependency context, and notes before dispatch.
 2. **Dispatch**: assign approved issues to Copilot, Claude, or Codex.
 3. **Monitor**: wait and poll until PRs are created or sessions fail.
 4. **Review**: request Code Review Agent review, judge comments, send actionable fixes, repeat.

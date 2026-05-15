@@ -7,6 +7,8 @@
 - Group unblocked issues into waves.
 - Select agent and base branch per issue.
 - Present the plan before dispatch.
+- Show a wave dispatch table with one row per issue covering: task, issue, agent, model, base branch, dependency or blocker context, and notes.
+- If model choice is not available for a row, mark the model as `default` rather than leaving it implicit.
 
 ## Phase 1b: Draft issues
 
