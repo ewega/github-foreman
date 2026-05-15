@@ -15,7 +15,21 @@ Use this skill whenever the Foreman is dispatching GitHub issues to Copilot, Cla
 
 When unsure, use Copilot.
 
-When the assignment path allows explicit model selection, prefer lighter execution-oriented models for routine coding work, edits, and fixup loops. Examples include Haiku-class models or other lightweight code-execution models. Reserve heavier models for planning, architecture, or unusually complex refactors where the extra reasoning depth is necessary.
+## Dispatch review before assignment
+
+Before assigning any issue, present a compact Markdown table and wait for explicit human approval. The table is the pre-dispatch gate.
+
+| Wave | Issue | Title | Agent | Model/Profile | Dispatch mechanism | Base branch | Dependency context | Validation focus | Notes/Risks |
+|------|-------|-------|-------|---------------|--------------------|-------------|--------------------|------------------|-------------|
+| ... | #... | ... | Copilot / Claude / Codex | repository-developer + model, native Copilot model, or bot profile | `gh agent-task --custom-agent`, native Copilot fallback, or GraphQL bot assignment | ... | unblocked / blocked by / branches from | ... | ... |
+
+Rules:
+
+- For Copilot custom-agent dispatch, show `Copilot` as the agent and `repository-developer` plus the selected model when known.
+- For native/default Copilot fallback, label the fallback explicitly and show the requested model when known; use `default/unknown` if the model is not observable.
+- For Claude and Codex, show the bot profile and state that base-branch and dependency context will be delivered through an issue comment.
+- If any row lacks an issue, agent, model/profile, dispatch mechanism, base branch, or dependency context, ask for clarification before dispatching that row.
+- After approval, dispatch independent approved rows in parallel when safe. Hold unapproved rows back.
 
 ## Copilot assignment
 
@@ -48,8 +62,6 @@ If the preflight fails, fall back to the native/default Copilot assignment path 
 - model
 - custom instructions
 
-For the `model` field, prefer a lighter execution-oriented model by default. Only escalate to a heavier model when the task is materially reasoning-bound rather than execution-bound.
-
 Custom instructions should include:
 
 - issue acceptance criteria
@@ -59,6 +71,22 @@ Custom instructions should include:
 - branch/dependency constraints
 
 Do not silently create `.github/agents/repository-developer.agent.md` in arbitrary target repositories. If a repo should use the cloud custom-agent path, surface that as an explicit setup step.
+
+## Target repository custom-agent setup
+
+During Foreman setup, preflight both target-repo agent files:
+
+```sh
+gh api repos/OWNER/REPO/contents/.github/agents/repository-developer.agent.md
+gh api repos/OWNER/REPO/contents/.github/agents/docs-writer.agent.md
+```
+
+If either file is missing, tell the user which files are absent and what they enable. Ask whether Foreman should create them now.
+
+- If the user approves, fetch the canonical agent content from `ewega/github-foreman` and commit each missing file to the target repository's default branch with the message `chore: add foreman agent files`.
+- If the user declines, use native Copilot fallback for implementation dispatch and skip cloud docs-writer tasks until `.github/agents/docs-writer.agent.md` exists.
+
+Never create or overwrite target-repo custom-agent files without explicit user approval.
 
 ## Claude and Codex assignment
 
@@ -77,7 +105,6 @@ Important constraints:
 - To provide extra context, add an issue comment before assigning the bot.
 - Include dependency and base-branch context in that issue comment.
 - Confirm the assignment response includes the expected bot login.
-- When the bot or assignment surface exposes model choice, prefer lighter execution-oriented models first and only step up when the issue truly needs deeper reasoning.
 
 ## Context comment template for Claude/Codex
 

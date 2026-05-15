@@ -16,7 +16,7 @@ Before using `--custom-agent docs-writer`, check whether the target repository e
 gh api repos/OWNER/REPO/contents/.github/agents/docs-writer.agent.md --jq .path
 ```
 
-If this succeeds, use the custom-agent path. If it fails, fall back to the local `docs-writer` subagent and report the fallback. Do not silently create repo-local custom agent files.
+If this succeeds, use the custom-agent path. If it fails, skip the docs task for this session and report the limitation to the user. Do not invoke `docs-writer` locally and do not silently create repo-local custom agent files.
 
 ## Create the docs task
 
@@ -51,5 +51,5 @@ Outcomes:
 
 - terminal success with no PR: record docs check complete
 - terminal success with PR: add docs PR to wave tracking and include it in review/CI/human gate
-- failure: summarize and either retry once or fall back to local docs writer
+- failure: summarize and either retry once or report the failed docs pass to the user
 - running/pending: preserve Foreman sleep/poll cadence

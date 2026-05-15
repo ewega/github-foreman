@@ -17,3 +17,9 @@ Preserve this cadence from the original Foreman workflow unless the user explici
 Use `sleep` on macOS/Linux and `Start-Sleep` on Windows.
 
 Do not ask the human to trigger the next phase after dispatch. Monitoring, review, and CI gates run automatically until the human gate.
+
+Session IDs, assignment confirmations, draft PR URLs, and WIP PR status are progress updates only. They are not valid stopping points.
+
+Run sleep and polling commands so Foreman can observe completion and continue. If a terminal command is still running or times out into the background, fetch its output and keep polling before ending the turn.
+
+During long waits, Foreman may briefly summarize what it is waiting for, but it must not ask the human to say "continue" before the next poll.

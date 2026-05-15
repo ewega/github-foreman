@@ -13,7 +13,5 @@
     "pull-requests",
     "issues",
     "foreman"
-  ],
-  "agents": "agents/",
-  "skills": "skills/"
+  ]
 }

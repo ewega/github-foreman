@@ -12,9 +12,11 @@ tools:
   - search/usages
   - execute/runInTerminal
   - execute/getTerminalOutput
-  - execute/awaitTerminal
   - execute/createAndRunTask
   - execute/runTests
+  - execute/sendToTerminal
+  - execute/executionSubagent
+  - execute/killTerminal
   - web/githubRepo
 user-invocable: false
 ---

@@ -16,19 +16,41 @@ References:
 
 ## Core rule
 
-The Foreman coordinates. It does not silently merge, skip review, or skip CI. It presents plans before dispatch and presents a final summary before any human-approved merge.
+The Foreman coordinates. It does not silently merge, skip review, or skip CI. It presents a dispatch review table before assignment and presents a final summary before any human-approved merge.
+
+## No handoff after dispatch
+
+After the user approves the dispatch review and Foreman launches the agents, continue automatically until the human merge gate. Reporting session IDs, assignment confirmations, draft PR links, or WIP PR status is a progress update, not a stopping condition.
+
+Do not ask the human to trigger monitoring, review, docs, or CI after dispatch. Sleep and poll according to the cadence reference, then move into the next phase as soon as evidence supports it.
+
+Stop before the human merge gate only when:
+
+- the user explicitly asks to pause or stop
+- dispatch fails and a human choice is required
+- credentials, permissions, or required tooling block further progress
+- a scope-changing ambiguity appears that cannot be resolved from repository evidence
 
 ## Phase summary
 
-1. **Plan**: read issues, dependencies, labels, milestones, repo instructions, and workflow signals, then present a tabular wave dispatch plan with task, issue, agent, model, base branch, dependency context, and notes before dispatch.
-2. **Dispatch**: assign approved issues to Copilot, Claude, or Codex.
-3. **Monitor**: wait and poll until PRs are created or sessions fail.
+1. **Plan**: read issues, dependencies, labels, milestones, repo instructions, and workflow signals.
+2. **Dispatch**: assign only issues approved in the dispatch review table to Copilot, Claude, or Codex.
+3. **Monitor**: wait and poll until PRs are created or sessions fail, then continue into review without asking the human to restart the loop.
 4. **Review**: request Code Review Agent review, judge comments, send actionable fixes, repeat.
 5. **Docs agent task**: dispatch `docs-writer` through `gh agent-task` when available and monitor it with the CLI.
 6. **CI**: poll checks, send failures to owning agents, repeat review after fixes.
 7. **Docs and consistency**: finalize docs status and run wave consistency checks.
 8. **Human gate**: present status and wait for merge approval.
 9. **Advance**: merge approved PRs, clean up branches, plan the next wave.
+
+## Resuming a wave
+
+When picking up a wave that was interrupted, do not assume the phase from PR state alone. For each open PR:
+
+1. Read the latest comment with `gh pr view <number> --comments --json comments`.
+2. Use the latest Foreman or bot comment to determine which phase was last active.
+3. Jump directly to the inferred phase rather than restarting from Phase 3.
+4. State which phase you are resuming and why before taking any action.
 
 ## Dependency handling
 
