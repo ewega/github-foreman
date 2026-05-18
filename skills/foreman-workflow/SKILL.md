@@ -37,9 +37,9 @@ Stop before the human merge gate only when:
 2. **Dispatch**: assign only issues approved in the dispatch review table to Copilot, Claude, or Codex.
 3. **Monitor**: wait and poll until PRs are created or sessions fail, then continue into review without asking the human to restart the loop.
 4. **Review**: request Code Review Agent review, judge comments, send actionable fixes, repeat.
-5. **Docs agent task**: dispatch `docs-writer` through `gh agent-task` when available and monitor it with the CLI.
-6. **CI**: poll checks, send failures to owning agents, repeat review after fixes.
-7. **Docs and consistency**: finalize docs status and run wave consistency checks.
+5. **CI**: poll checks, send failures to owning agents, repeat review after fixes.
+6. **Docs agent task**: after CI is green, dispatch `docs-writer` through `gh agent-task` when available and monitor it with the CLI.
+7. **Consistency**: finalize docs status and run wave consistency checks, including cross-docs validation.
 8. **Human gate**: present status and wait for merge approval.
 9. **Advance**: merge approved PRs, clean up branches, plan the next wave.
 

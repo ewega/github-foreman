@@ -1,6 +1,6 @@
 # Docs writer agent task
 
-At the end of a clean review loop, Foreman should dispatch the docs writer as a GitHub agent task when possible.
+After the code PR review loop is clean and Foreman has checked that all required CI checks are green, Foreman should dispatch the docs writer as a GitHub agent task when possible.
 
 ## Preflight
 
@@ -28,6 +28,7 @@ Use a task file or stdin. The task should include:
 - repository instructions discovered during intake
 - docs that should be checked
 - acceptance criteria for the docs pass
+- current PR commits and files after any CI-fix commits, so the docs pass reflects the latest behavior
 
 ```sh
 gh agent-task create --repo OWNER/REPO --base BASE_BRANCH --custom-agent docs-writer -F docs-writer-task.md

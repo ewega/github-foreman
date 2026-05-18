@@ -53,7 +53,7 @@ Column notes:
 - Sleep before first poll.
 - Poll job status and PR lists.
 - Continue until every dispatch has a PR or failure.
-- Do not stop while agents are merely running or PRs are draft/WIP. Continue automatically through review, docs, CI, and docs/consistency until Phase 6 human gate.
+- Do not stop while agents are merely running or PRs are draft/WIP. Continue automatically through review, CI, docs-writer, and consistency until Phase 6 human gate.
 - Stop early only if the user asks to pause or stop, dispatch fails and requires a human choice, credentials/permissions/tooling block progress, or a scope-changing ambiguity cannot be resolved from repository evidence.
 - If `SessionStart` hook context already provided active wave state, use that before doing any manual resume work.
 - Otherwise, if `.github/foreman/wave-state.json` exists in the local workspace, read it and apply the same active-versus-terminal rules before inferring state from PR comments.
@@ -61,7 +61,7 @@ Column notes:
   - Latest comment requests Code Review Agent → resume Phase 3 (review loop).
   - Latest comment is a fix request to a coding agent → wait for new commits, then return to review loop.
   - Latest comment is a CI failure summary or fix request for failing checks → resume Phase 4 (CI gate).
-  - Latest comment is a docs writer dispatch or status update → resume Phase 3.5 (docs agent task).
+  - Latest comment is a docs writer dispatch or status update → resume Phase 4b (docs writer agent task).
   - Latest comment is a human gate summary → resume Phase 6 (human gate).
   - No recent Foreman comment → start from Phase 3 (review loop).
 
@@ -74,24 +74,27 @@ Column notes:
 - Send actionable fixes.
 - Repeat until clean.
 
-## Phase 3.5: Docs writer agent task
-
-- Preflight whether the target repo exposes `.github/agents/docs-writer.agent.md`.
-- If available, create a docs task with `gh agent-task create --custom-agent docs-writer`.
-- Monitor with `gh agent-task view --json`.
-- If the task produces a PR, add it to wave tracking.
-- If the custom-agent task path is unavailable, skip the docs task, notify the user, and record the skip. Do not invoke `docs-writer` locally.
-
 ## Phase 4: CI gate
 
 - Poll checks.
 - If red, send failure summary to owning agent and wait for commits.
 - Return to review after code changes.
+- If all required checks are green, continue to the docs writer agent task.
+
+## Phase 4b: Docs writer agent task
+
+- Run only after Foreman has checked CI and all required checks are green.
+- Use the Phase 0 preflight result or re-check whether the target repo exposes `.github/agents/docs-writer.agent.md`.
+- If available, create a docs task with `gh agent-task create --custom-agent docs-writer`.
+- Build the docs task from current PR state, including any commits added during CI failure recovery.
+- Monitor with `gh agent-task view --json`.
+- If the task produces a PR, add it to wave tracking for consistency and the human gate.
+- If the custom-agent task path is unavailable, skip the docs task, notify the user, and record the skip. Do not invoke `docs-writer` locally.
 
 ## Phase 5: Docs and consistency
 
-- Run cross-PR consistency review for multi-PR waves.
 - Confirm the docs writer task result is reflected in the wave status.
+- Run one consistency review for multi-PR waves, including cross-docs validation.
 - Use this report format:
 
 ```md
@@ -108,6 +111,11 @@ Column notes:
 
 ### Docs Impact
 - [OK or issue]
+
+### Cross-Docs Consistency
+- [docs file or subsystem]: [finding]
+- Docs-writer output vs. code PR behavior: [OK or issue]
+- Docs changes across PRs and README/instructions alignment: [OK or issue]
 
 ### Recommendation
 - PASS / WARN / BLOCK

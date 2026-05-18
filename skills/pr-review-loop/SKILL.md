@@ -25,7 +25,7 @@ References:
 7. Wait for new commits.
 8. Request a fresh review cycle after code changes.
 9. Exit only when no actionable comments remain.
-10. Dispatch the docs writer agent task before moving to CI.
+10. Move to the CI gate.
 
 ## Fix comments
 
@@ -39,10 +39,10 @@ Keep fix comments specific, concise, and grounded in reviewer evidence.
 
 ## CI loop
 
-After the review loop is clean and the docs writer task has completed or been skipped because the cloud custom-agent path is unavailable, poll checks. If checks fail, summarize the failure for the owning agent, request a fix, wait for new commits, then return to the review loop before trying CI again.
+After the review loop is clean, poll checks. If checks fail, summarize the failure for the owning agent, request a fix, wait for new commits, then return to the review loop before trying CI again. When all required checks are green, dispatch the docs writer agent task.
 
 ## Docs writer task
 
-At the end of a clean review loop, dispatch the docs writer through `gh agent-task create --custom-agent docs-writer` when the target repository exposes that custom agent. Monitor it with `gh agent-task view --json`.
+After CI passes, dispatch the docs writer through `gh agent-task create --custom-agent docs-writer` when the target repository exposes that custom agent. Monitor it with `gh agent-task view --json`.
 
-If the task creates a docs PR, add that PR to wave tracking and include it in review, CI, and the human gate. If the custom-agent task path is unavailable, skip the docs task for this session, report the limitation, and do not invoke `docs-writer` locally.
+If the task creates a docs PR, add that PR to wave tracking and include it in the post-CI consistency report and the human gate. If required checks on a docs PR block merge, report that status at the gate or send a focused docs fix task as appropriate; do not move the docs writer ahead of code CI. If the custom-agent task path is unavailable, skip the docs task for this session, report the limitation, and do not invoke `docs-writer` locally.

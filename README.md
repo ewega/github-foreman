@@ -59,60 +59,15 @@ The Foreman agent follows this sequence:
 4. Dispatch approved work, then keep monitoring automatically. Session IDs, assignment confirmations, and draft PR links are progress updates, not completion.
 5. Monitor for PR creation. For resumed waves, use `SessionStart` hook context backed by the local `.github/foreman/wave-state.json` when it describes an active wave; otherwise read the latest comment on each existing PR to determine which phase to jump back into.
 6. Request and evaluate Code Review Agent feedback.
-7. Dispatch the docs writer through `gh agent-task` when available.
-8. Poll CI and send failures back to the owning agent.
-9. Check docs and multi-PR consistency.
+7. Poll CI and send failures back to the owning agent.
+8. Dispatch the docs writer through `gh agent-task` when available.
+9. Run the consistency check, including cross-docs validation.
 10. Present a human merge gate.
 11. Merge only after explicit human approval.
 
 ### Interaction model
 
-```mermaid
-graph TB
-    H["👤 Human Developer"]
-    F["🎯 GitHub Foreman"]
-    
-    subgraph github["GitHub"]
-        Issues["📋 Issues"]
-        WaveStart["🌊 Wave Start"]
-        
-        subgraph agents["Agents"]
-            Working["Copilot (repo-dev)<br/>Claude / Codex"]
-            CodeReview["Copilot (Code Review Agent)"]
-            DW["Copilot (docs-writer)"]
-        end
-        
-        PRs["🔀 PRs"]
-        CI["✅ CI"]
-        Base["📦 Base Branch"]
-        WaveEnd["🏁 Wave End"]
-    end
-    
-    H -->|"plan"| F
-    F -->|"create/update"| Issues
-    Issues -->|"read"| WaveStart
-    F -->|"start"| WaveStart
-    WaveStart -->|"dispatch to"| Working
-    Working -->|"opens"| PRs
-    
-    Working <-->|"review"| CodeReview
-    CodeReview -->|"approved"| DW
-    DW -->|"end result"| PRs
-    
-    PRs <-->|"trigger/status"| CI
-    
-    F -->|"summary"| H
-    H -->|"approve merge"| F
-    F -->|"wave review"| PRs
-    PRs -->|"merged"| Base
-    Base --> WaveEnd
-    
-    style H fill:#e1f5ff
-    style F fill:#fff3e0
-    style Working fill:#c8e6c9
-    style CodeReview fill:#c8e6c9
-    style DW fill:#c8e6c9
-```
+[![Foreman interaction model](assets/foreman-architecture.png)](https://raw.githubusercontent.com/ewega/github-foreman/main/assets/foreman-architecture.png)
 
 ### Sequential flow
 
@@ -138,12 +93,12 @@ sequenceDiagram
     Foreman->>CodeReview: Request review
     CodeReview->>GitHub: Review & comment
     Foreman->>GitHub: Monitor & send fixes if needed
+
+    Foreman->>CI: Monitor checks
+    CI-->>GitHub: Pass/fail status
     
     Foreman->>DocsWriter: Dispatch docs writer
     DocsWriter->>GitHub: Optional docs updates
-    
-    Foreman->>CI: Monitor checks
-    CI-->>GitHub: Pass/fail status
     
     Foreman-->>Human: Human gate summary
     Human->>Foreman: Merge approval
@@ -156,16 +111,16 @@ sequenceDiagram
 - Foreman is moving toward CLI-first GitHub management: issue intake, PR discovery, review state, checks, and agent-task state should prefer `gh` commands with `--json`; GitHub MCP tools remain fallback while this is experimental.
 - Before assigning agents, Foreman presents a dispatch review table that identifies each issue, selected agent, model/profile, dispatch mechanism, base branch, dependency context, validation focus, and risks. Only approved rows are dispatched.
 - When Foreman selects Copilot as the cloud implementer, it should prefer `gh agent-task create --custom-agent repository-developer` so Copilot uses the repository-developer custom agent profile, when the target repo exposes `.github/agents/repository-developer.agent.md`.
-- After dispatch succeeds, Foreman treats session IDs, assignment confirmations, draft PR links, and WIP PR status as interim progress signals. It continues sleeping and polling through review, docs, CI, and consistency until the human merge gate unless a real blocker requires human input.
-- Docs review runs at the end of a clean review loop through `gh agent-task create --custom-agent docs-writer` when the target repository exposes `.github/agents/docs-writer.agent.md`; otherwise Foreman reports that the docs task is unavailable and does not invoke `docs-writer` locally unless the human explicitly chooses the local handoff.
+- After dispatch succeeds, Foreman treats session IDs, assignment confirmations, draft PR links, and WIP PR status as interim progress signals. It continues sleeping and polling through review, CI, docs-writer, and consistency until the human merge gate unless a real blocker requires human input.
+- Docs writer runs after Foreman has checked CI green through `gh agent-task create --custom-agent docs-writer` when the target repository exposes `.github/agents/docs-writer.agent.md`; otherwise Foreman reports that the docs task is unavailable and does not invoke `docs-writer` locally unless the human explicitly chooses the local handoff.
 - Preserve the polling cadence from the original Foreman workflow:
   - 300s initial wait after dispatch
   - 120s PR polling
   - 300s wait after requesting review
   - 120s review polling
   - 180s wait after fix requests
-  - 120s docs-writer task polling
   - 120s CI polling
+  - 120s docs-writer task polling
 - When resuming an interrupted wave, Foreman first consumes any `SessionStart` hook context and uses the local `.github/foreman/wave-state.json` only when it describes an active wave. If hook context is unavailable or the saved state is terminal, Foreman falls back to the latest comment on each open PR (`gh pr view <number> --comments --json comments`) to infer the active phase (review loop, CI gate, docs task, or human gate) and jumps directly there instead of restarting from Phase 3.
 - Foreman keeps orchestration state in the local workspace under `.github/foreman/wave-state.json`. This file is workspace state, not product code, and should not be committed as part of repository changes.
 - Before the human gate, Foreman writes an in-flight snapshot such as `phase: human-gate`, `status: awaiting-merge-approval`, and `active: true`. After a wave is fully complete, Foreman should either overwrite the file with the next active wave or mark the prior wave terminal with `status: completed` and `active: false`.

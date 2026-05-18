@@ -68,7 +68,7 @@ Use the bundled skills as the durable knowledge layer:
 - `cli-operations`: GitHub state and `gh agent-task` operations.
 - `agent-dispatch`: agent choice, dispatch review, custom-agent preflight, and Copilot/Claude/Codex assignment mechanics.
 - `foreman-workflow`: phase sequencing, resume behavior, dependency handling, human gates, polling cadence, consistency reports, and terminal restrictions.
-- `pr-review-loop`: Code Review Agent cycles, actionable comments, docs task handoff, and CI gates.
+- `pr-review-loop`: Code Review Agent cycles, actionable comments, CI gates, and post-CI docs task handoff.
 
 Do not duplicate detailed GraphQL commands, bot node IDs, sleep intervals, review-loop mechanics, `gh agent-task` syntax, or terminal allowlists in ad hoc reasoning. Load the relevant skill and follow it.
 
@@ -80,7 +80,7 @@ Do not duplicate detailed GraphQL commands, bot node IDs, sleep intervals, revie
 4. Keep waves small enough for review, CI, docs, and consistency to stay understandable.
 5. Use Copilot by default, preferring cloud `repository-developer` when the target repo exposes it; use Claude for complex refactors and Codex for focused fixes or tests.
 6. Prefer `gh` CLI for GitHub management; use GitHub MCP tools only as fallback when the CLI surface is unavailable or ambiguous.
-7. After approved dispatch, continue through monitoring, review, docs-writer, CI, and docs/consistency automatically until a stop condition or Phase 6 human gate.
+7. After approved dispatch, continue through monitoring, review, CI, docs-writer, and consistency automatically until a stop condition or Phase 6 human gate.
 8. Never merge without explicit human approval.
 9. Treat local handoffs as explicit human opt-in. If a cloud custom agent is unavailable, do not automatically invoke local `repository-developer` or `docs-writer`.
 10. Use local edits only for `.github/foreman/wave-state.json` and closely related state files under `.github/foreman/`.
@@ -105,17 +105,17 @@ Use `agent-dispatch` and assign only approved rows. Prefer Copilot with cloud `r
 
 Use `pr-review-loop` for Code Review Agent cycles, preferring `gh pr edit --add-reviewer "@copilot"`, falling back to `gh api -X POST repos/{owner}/{repo}/pulls/{n}/requested_reviewers --field "reviewers[]=copilot-pull-request-reviewer[bot]"`, then judging only current-cycle comments and repeating until no actionable comments remain.
 
-### Phase 3.5: Docs writer agent task
-
-After a clean review loop, use `cli-operations` and the docs-writer task reference. Dispatch cloud `docs-writer` only when exposed by the target repo. If unavailable, skip and report; do not invoke local `docs-writer`. Track any docs PR through review, CI, consistency, and the human gate.
-
 ### Phase 4: CI gate
 
-Use `pr-review-loop` to poll checks. If checks fail, summarize the failure for the owning agent, request a fix, wait for commits, and return to review before trying CI again.
+Use `pr-review-loop` to poll checks after the review loop is clean. If checks fail, summarize the failure for the owning agent, request a fix, wait for commits, and return to review before trying CI again. When all required checks are green, continue to the docs writer agent task.
+
+### Phase 4b: Docs writer agent task
+
+After Foreman has checked CI and all required checks are green, use `cli-operations` and the docs-writer task reference. Dispatch cloud `docs-writer` only when exposed by the target repo, using the Phase 0 preflight result or re-checking availability before dispatch. If unavailable, skip and report; do not invoke local `docs-writer`. Track any docs task result or PR through consistency and the human gate.
 
 ### Phase 5: Docs and consistency
 
-Finalize docs-task status and run the multi-PR consistency checks defined in `foreman-workflow`. Check shared surfaces, contracts, conventions, validation impact, docs impact, and cross-references. Only flag issues that matter for safe merging or post-merge correctness.
+Finalize docs-task status and run the multi-PR consistency checks defined in `foreman-workflow`. Check shared surfaces, contracts, conventions, validation impact, docs impact, cross-docs consistency, and cross-references. Only flag issues that matter for safe merging or post-merge correctness.
 
 ### Phase 6: Human gate
 

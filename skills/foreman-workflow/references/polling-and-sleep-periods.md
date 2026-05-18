@@ -10,13 +10,13 @@ Preserve this cadence from the original Foreman workflow unless the user explici
 | Polling for submitted review completion | 2 minutes / 120 seconds |
 | Wait after posting actionable fix requests | 3 minutes / 180 seconds |
 | Polling for commits after fix request | 2 minutes / 120 seconds |
-| Polling docs writer agent task | 2 minutes / 120 seconds |
 | Wait after posting CI failure fix request | 3 minutes / 180 seconds |
 | CI polling | 2 minutes / 120 seconds |
+| Polling docs writer agent task | 2 minutes / 120 seconds |
 
 Use `sleep` on macOS/Linux and `Start-Sleep` on Windows.
 
-Do not ask the human to trigger the next phase after dispatch. Monitoring, review, and CI gates run automatically until the human gate.
+Do not ask the human to trigger the next phase after dispatch. Monitoring, review, CI, docs-writer, and consistency run automatically until the human gate.
 
 Session IDs, assignment confirmations, draft PR URLs, and WIP PR status are progress updates only. They are not valid stopping points.
 

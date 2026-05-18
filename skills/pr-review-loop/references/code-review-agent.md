@@ -22,4 +22,4 @@ After requesting review:
 3. Use review data to wait until the Code Review Agent has submitted a terminal review state such as `APPROVED`, `CHANGES_REQUESTED`, or `COMMENTED`.
 4. Treat every fresh review request as a new timestamp-bounded cycle.
 5. Judge only comments from the latest cycle.
-6. When no actionable comments remain, move to the docs writer agent task before CI.
+6. When no actionable comments remain, move to the CI gate.

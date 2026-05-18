@@ -2,12 +2,12 @@
 
 CI runs automatically on PR pushes. The Foreman should poll existing repository checks rather than inventing new validation.
 
-Before entering the CI gate, the clean review loop should have dispatched and completed the docs writer agent task or explicitly fallen back to the local docs writer.
+Enter the CI gate after the review loop is clean. The docs writer agent task runs only after Foreman has checked that all required CI checks are green.
 
 Process:
 
 1. Poll checks every 2 minutes / 120 seconds until all required runs complete.
-2. If all green, continue to docs and consistency.
+2. If all green, continue to the docs writer agent task.
 3. If any check fails:
    - read the failing check details
    - summarize the failure
