@@ -17,21 +17,37 @@ When unsure, use Copilot.
 
 ## Dispatch review before assignment
 
-Before assigning any issue, present a compact Markdown table and wait for explicit human approval. The table is the pre-dispatch gate.
+Before assigning any issue, present a compact Markdown table spanning all planned waves and wait for explicit human approval. The table is the pre-dispatch gate.
 
-| Wave | Issue | Title | Agent | Model/Profile | Dispatch mechanism | Base branch | Dependency context | Validation focus | Notes/Risks |
-|------|-------|-------|-------|---------------|--------------------|-------------|--------------------|------------------|-------------|
-| ... | #... | ... | Copilot / Claude / Codex | repository-developer + model, native Copilot model, or bot profile | `gh agent-task --custom-agent`, native Copilot fallback, or GraphQL bot assignment | ... | unblocked / blocked by / branches from | ... | ... |
+| Wave | Issue | Title | Working branch | Agent | Model | Dispatch mechanism | Base branch | Dependency context | Validation focus | Notes/Risks |
+|------|-------|-------|----------------|-------|-------|--------------------|-------------|--------------------|------------------|-------------|
+| 1 | #... | ... | `feat/issue-N-short-slug` | Copilot / Claude / Codex | e.g. `gpt-4.1`, `claude-sonnet-4-5`, `o3` | `gh agent-task --custom-agent`, native Copilot fallback, or GraphQL bot assignment | ... | unblocked / blocked by #N / branches from #N-branch | ... | ... |
+| 2 | #... | ... | `feat/issue-N-short-slug` | ... | ... | ... | ... | blocked by Wave 1 | ... | ... |
 
 Rules:
 
+- **Working branch**: derive a short, kebab-case branch name from the issue number and title (e.g. `feat/42-add-auth`). This is the branch the agent will open the PR from.
+- **Model**: show the specific model identifier when known (e.g. `gpt-4.1`, `claude-sonnet-4-5`, `o3`). Use `default/unknown` if not observable or not yet selected.
+- **Multi-wave**: include all planned waves in the same table so the human can see the full dispatch plan before approving any row. Rows for later waves are shown for visibility; they are only dispatched after their wave's prerequisites are met.
 - For Copilot custom-agent dispatch, show `Copilot` as the agent and `repository-developer` plus the selected model when known.
 - For native/default Copilot fallback, label the fallback explicitly and show the requested model when known; use `default/unknown` if the model is not observable.
 - For Claude and Codex, show the bot profile and state that base-branch and dependency context will be delivered through an issue comment.
-- If any row lacks an issue, agent, model/profile, dispatch mechanism, base branch, or dependency context, ask for clarification before dispatching that row.
-- After approval, dispatch independent approved rows in parallel when safe. Hold unapproved rows back.
+- If any row lacks an issue, working branch, agent, model, dispatch mechanism, base branch, or dependency context, ask for clarification before dispatching that row.
+- After approval, dispatch independent approved rows in parallel when safe. Hold unapproved rows and later-wave rows back until their prerequisites are met.
 
 ## Copilot assignment
+
+### Model selection for repository-developer
+
+When dispatching to `repository-developer`, prefer a lightweight model unless the task clearly requires deep reasoning. Use a heavier model only when the task involves large multi-file refactors, complex architectural decisions, or tasks that previously stalled on a lighter model.
+
+| Task characteristics | Recommended model tier |
+|----------------------|------------------------|
+| Bug fix, test update, small feature, doc change | lightweight (e.g. `gpt-4.1-mini`, `gpt-4o-mini`) |
+| Medium feature with cross-file coordination | standard (e.g. `gpt-4.1`, `gpt-4o`) |
+| Large refactor, deep reasoning required | heavy (e.g. `o3`, `claude-sonnet-4-5`) |
+
+Show the selected model in the **Model** column of the dispatch review table. If the `gh agent-task` CLI supports `--model`, pass it explicitly; otherwise note the model as the requested preference in the task description header.
 
 Prefer CLI cloud-task assignment with the repository-developer custom agent:
 

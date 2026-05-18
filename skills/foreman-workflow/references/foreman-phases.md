@@ -13,10 +13,25 @@
 
 - Read open issues and issue bodies.
 - Find dependency markers like `Blocked by`, `Blocks`, linked issues, linked PRs, labels, and milestones.
-- Group unblocked issues into waves.
-- Select agent and base branch per issue.
-- Present a dispatch review table before dispatch. Include issue, title, agent, model/profile, dispatch mechanism, base branch, dependency context, validation focus, and risks.
+- Group all issues into waves based on dependencies and logical sequencing — plan multiple waves at once.
+- For each issue, derive a working branch name (short kebab-case slug from the issue number and title) and select agent, model, and base branch.
+- Present a **multi-wave dispatch review table** before dispatch. Show every planned wave in a single table using the format below.
 - Wait for explicit approval before assigning any row. The user may approve all rows, modify rows, or hold rows back.
+- Later-wave rows are shown for visibility only; they are not dispatched until their wave's prerequisites are complete.
+
+### Dispatch review table format
+
+| Wave | Issue | Title | Working branch | Agent | Model | Dispatch mechanism | Base branch | Dependency context | Validation focus | Notes/Risks |
+|------|-------|-------|----------------|-------|-------|--------------------|-------------|--------------------|------------------|-------------|
+| 1 | #12 | Add auth middleware | `feat/12-add-auth-middleware` | Copilot | `gpt-4.1` | `gh agent-task --custom-agent repository-developer` | `main` | unblocked | run tests, lint | — |
+| 1 | #15 | Fix null deref in parser | `fix/15-null-deref-parser` | Codex | `o3` | GraphQL bot assignment | `main` | unblocked | unit tests pass | — |
+| 2 | #18 | Add auth to API routes | `feat/18-auth-api-routes` | Copilot | `gpt-4.1` | `gh agent-task --custom-agent repository-developer` | `feat/12-add-auth-middleware` | blocked by #12 | integration tests | branches from Wave 1 PR |
+
+Column notes:
+- **Working branch**: kebab-case slug from issue number + title (e.g. `feat/42-short-title`).
+- **Model**: specific identifier when known (`gpt-4.1`, `claude-sonnet-4-5`, `o3`); use `default/unknown` if not observable.
+- **Dispatch mechanism**: `gh agent-task --custom-agent repository-developer`, `native Copilot`, or `GraphQL bot assignment`.
+- **Dependency context**: `unblocked`, `blocked by #N`, or `branches from <branch>`.
 
 ## Phase 1b: Draft issues
 
